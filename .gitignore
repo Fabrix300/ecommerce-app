@@ -1,0 +1,10 @@
+# Node.js
+node_modules/
+dist/
+
+# IDEs y entornos de desarrollo
+.vscode/
+.idea/
+
+# Archivos de entorno
+.env
