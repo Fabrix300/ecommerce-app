@@ -17,17 +17,11 @@ module.exports = {
     },
     extend: {},
   },
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
   daysiui: {
-    themes: [
-      {
-        fantasy: {
-          primary: "#0000ff",
-          "primary-content": "white",
-          secondary: "#f6f6f6",
-          neutral: "#e8e8e8",
-        },
-      },
-    ],
+    themes: ["light", "dark", "cupcake"],
+    // themes: false, // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
+    // darkTheme: "dark",
     base: true,
     styled: true,
     utils: true,
@@ -35,5 +29,4 @@ module.exports = {
     logs: true,
     themeRoot: ":root",
   },
-  plugins: [require("@tailwindcss/typography"), require("daisyui")],
 };
