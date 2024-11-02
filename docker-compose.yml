@@ -1,0 +1,17 @@
+services:
+  ecommerce-db:
+    image: postgres:latest
+    container_name: ecommerce-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres        # Usuario que se creará
+      POSTGRES_PASSWORD: postgres     # Contraseña para el usuario
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistencia de datos
+
+volumes:
+  postgres_data:
+    driver: local
