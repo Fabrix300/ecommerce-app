@@ -1,5 +1,9 @@
 package dev.fabrix.user_service.controller;
 
-public class UserController {
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
 }

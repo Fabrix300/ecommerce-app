@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: user-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/ecommerce
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+application:
+  security:
+    jwt:
+      secret-key: fsp250400
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
