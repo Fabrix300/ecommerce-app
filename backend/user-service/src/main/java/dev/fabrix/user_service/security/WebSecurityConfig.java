@@ -9,7 +9,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
-
     // @Override
     // protected void configure(HttpSecurity http) throws Exception {
     // http.csrf().disable() // Deshabilitar CSRF para simplificar en esta etapa
@@ -24,9 +23,4 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()).csrf(csrf -> csrf.disable());
         return http.build();
     }
-
-    // @Bean
-    // public PasswordEncoder passwordEncoder() {
-    // return new BCryptPasswordEncoder(); // Para encriptar contraseñas
-    // }
 }
