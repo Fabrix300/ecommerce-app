@@ -27,6 +27,9 @@ public class Token {
     @JoinColumn(name = "user_id")
     public User user;
 
+    public Token() {
+    }
+
     public Long getId() {
         return id;
     }

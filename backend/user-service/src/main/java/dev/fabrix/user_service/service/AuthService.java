@@ -1,6 +1,11 @@
 package dev.fabrix.user_service.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,22 +19,16 @@ import dev.fabrix.user_service.repository.UserRepository;
 
 @Service
 public class AuthService {
-    private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-
     @Autowired
-    public AuthService(
-            TokenRepository tokenRepository,
-            PasswordEncoder passwordEncoder,
-            UserRepository userRepository,
-            JwtService jwtService) {
-        this.tokenRepository = tokenRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.jwtService = jwtService;
-    }
+    private UserRepository userRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public TokenResponse register(RegisterRequest request) {
         User user = new User.Builder()
@@ -45,14 +44,49 @@ public class AuthService {
     }
 
     public TokenResponse login(LoginRequest request) {
-        // return userRepository.findByUsername(username)
-        // .filter(user -> passwordEncoder.matches(password, user.getPassword())); //
-        // Verify password
-        return null;
+        authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        User user = userRepository.findByEmail(request.email()).orElseThrow();
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(user, jwtToken);
+        return new TokenResponse(jwtToken, refreshToken);
     }
 
     public TokenResponse refreshToken(final String authHeader) {
-        return null;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Invalid Bearer token");
+        }
+
+        final String refreshToken = authHeader.substring(7);
+        final String userEmail = jwtService.extractUsername(refreshToken);
+
+        if (userEmail == null) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
+
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UsernameNotFoundException(userEmail));
+
+        if (!jwtService.isTokenValid(refreshToken, user)) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
+
+        final String accessToken = jwtService.generateToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(user, accessToken);
+        return new TokenResponse(accessToken, refreshToken);
+    }
+
+    private void revokeAllUserTokens(User user) {
+        final List<Token> validUserTokens = tokenRepository.findAllValidOrRevokedTokensByUserId(user.getId());
+        if (!validUserTokens.isEmpty()) {
+            for (final Token token : validUserTokens) {
+                token.setExpired(true);
+                token.setRevoked(true);
+            }
+            tokenRepository.saveAll(validUserTokens);
+        }
     }
 
     private void saveUserToken(User user, String jwtToken) {

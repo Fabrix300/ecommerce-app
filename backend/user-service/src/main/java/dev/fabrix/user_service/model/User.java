@@ -23,6 +23,9 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Token> tokens;
 
+    public User() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
