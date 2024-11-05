@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  # main:
+  #   allow-bean-definition-overriding: true
+  application:
+    name: ecommerce-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5433/ecommerce
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  security:
+    user:
+      name: Fabrix
+      password: Password123
+
+application:
+  security:
+    jwt:
+      secret-key: fsp250400asldko1indoin1wnoi4n36i6oinfoinf57inoi2oi42nfo6in4FJIFB3i5
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
